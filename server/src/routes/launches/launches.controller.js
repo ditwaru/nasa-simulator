@@ -4,9 +4,12 @@ const {
   abortLaunch,
   launchExists,
 } = require('../../models/launches.model');
+const { getPagination } = require('../../services/query');
 
 const httpGetAllLaunches = async (req, res) => {
-  res.json(await getAllLaunches());
+  const { skip, limit } = getPagination(req.query);
+  const launches = await getAllLaunches(skip, limit);
+  res.json(launches);
 };
 
 const httpAddNewLaunch = async (req, res) => {
@@ -19,6 +22,8 @@ const httpAddNewLaunch = async (req, res) => {
   }
 
   const dateNumberInMs = new Date(launch.launchDate).getTime();
+
+  console.log(dateNumberInMs);
   if (isNaN(dateNumberInMs)) {
     return res.status(400).json({
       error: 'Invalid date',

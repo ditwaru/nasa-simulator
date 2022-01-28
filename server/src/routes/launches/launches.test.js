@@ -17,7 +17,7 @@ describe('Testing Launches API', () => {
   describe('Test GET /launches', () => {
     test('It should respond with 200 success', async () => {
       const response = await request(app)
-        .get('/launches')
+        .get('/v1/launches')
         .expect(200)
         .expect('Content-Type', /json/);
     });
@@ -44,13 +44,14 @@ describe('Testing Launches API', () => {
     };
 
     const launchDataInvalidDate = {
+      mission: 'bruh',
       rocket: 'super rocket',
       target: 'Kepler-1652 b',
       launchDate: 'Februasdfasdfary 2nd, 2025',
     };
     test('It should respond with 201 created', async () => {
       const response = await request(app)
-        .post('/launches')
+        .post('/v1/launches')
         .send(completeLaunchData)
         .expect(201)
         .expect('Content-Type', /json/);
@@ -63,7 +64,7 @@ describe('Testing Launches API', () => {
 
     test('It should catch missing required properties', async () => {
       const response = await request(app)
-        .post('/launches')
+        .post('/v1/launches')
         .send(missingLaunchData)
         .expect(400);
 
@@ -72,12 +73,14 @@ describe('Testing Launches API', () => {
       });
     });
     test('It should catch invalid dates', async () => {
-      const response = request(app)
-        .post('/launches')
+      const response = await request(app)
+        .post('/v1/launches')
         .send(launchDataInvalidDate)
         .expect(400);
 
-      expect(response.body).toStrictEqual(undefined);
+      expect(response.body).toStrictEqual({
+        error: 'Invalid date',
+      });
     });
   });
 });
